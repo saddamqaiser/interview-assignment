@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Exercise</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+	<body>
+		<div id="info">Click on Box to View 2D Sprite Window.</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from "three";
+
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import { KMZLoader } from "three/addons/loaders/KMZLoader.js";
+			import { TGALoader } from "three/addons/loaders/TGALoader.js";
+
+			let camera, scene, renderer;
+
+			init();
+
+			function init() {
+				const loader = new TGALoader();
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x999999);
+
+				const light = new THREE.DirectionalLight(0xffffff);
+				light.position.set(0.5, 1.0, 0.5).normalize();
+
+				scene.add(light);
+
+				camera = new THREE.PerspectiveCamera(
+					35,
+					window.innerWidth / window.innerHeight,
+					1,
+					500
+				);
+
+				camera.position.y = 5;
+				camera.position.z = 10;
+
+				scene.add(camera);
+
+				const grid = new THREE.GridHelper(50, 50, 0xffffff, 0x333333);
+				scene.add(grid);
+
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
+				//Adding Cube
+				const geometry = new THREE.BoxGeometry(1, 1, 1);
+				// Create a texture for the cube
+				//var texture = new THREE.TextureLoader().load("");
+				const texture = loader.load("textures/crate_grey8.tga");
+
+				// Create a material for the cube
+				// const material = new THREE.MeshBasicMaterial({ map: texture });
+				const material = new THREE.MeshBasicMaterial({
+					color: 0xffffff,
+					map: texture,
+				});
+				//const material = new THREE.MeshBasicMaterial({ color: 0x00ff00,opacity:0.5});
+				const cube = new THREE.Mesh(geometry, material);
+				cube.translateY(0.5);
+				// cube.material.opacity = 0.5;
+				// cube.setInteractive(true);
+				cube.name = "objectName";
+
+				scene.add(cube);
+
+				// Use the lookAt method to focus the camera on the cube
+				camera.lookAt(cube.position);
+
+				const controls = new OrbitControls(camera, renderer.domElement);
+				controls.addEventListener("change", render);
+				controls.update();
+
+				window.addEventListener("resize", onWindowResize);
+
+				window.addEventListener("click", onDocumentMouseDown, false);
+
+				render();
+			}
+
+			const raycaster = new THREE.Raycaster();
+			const mouse = new THREE.Vector2();
+			// 	var object = scene.getObjectByName( "objectName" );
+			// Define the event handler function
+			function onDocumentMouseDown(event) {
+				//alert("here");
+				var object = scene.getObjectByName("objectName");
+				//console.log("object",object);
+
+				event.preventDefault();
+
+				mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+				raycaster.setFromCamera(mouse, camera);
+
+				const intersects = raycaster.intersectObjects(scene.children);
+
+				intersects.forEach((k, i) => {
+					if (k.object.uuid === object.uuid) {
+						console.log("Cube Clicked");
+						addSpriteWindow();
+					}
+				});
+			}
+
+			function addSpriteWindow() {
+				// Create the panel as a sprite
+				const panel = new THREE.Sprite(
+					new THREE.SpriteMaterial({ color: "white" })
+				);
+				panel.scale.set(15, 15, 15); // Set the size of the panel
+				panel.position.set(10, 5, 10); // Set the position of the panel
+				//panel.add(grid);
+				// Set up the camera
+				const left = -1;
+				const right = 1;
+				const top = 1;
+				const bottom = -1;
+				const near = 0.1;
+				const far = 10;
+				const camera = new THREE.OrthographicCamera(
+					left,
+					right,
+					top,
+					bottom,
+					near,
+					far
+				);
+				const grid = new THREE.GridHelper(1, 50, 0xffffff, 0x333333);
+
+				//Adding Cube
+				const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+				// Create a texture for the cube
+				//var texture = new THREE.TextureLoader().load("");
+				const loader = new TGALoader();
+				const texture = loader.load("textures/crate_grey8.tga");
+
+				// Create a material for the cube
+				// const material = new THREE.MeshBasicMaterial({ map: texture });
+				const material = new THREE.MeshBasicMaterial({
+					color: 0xffffff,
+					map: texture,
+				});
+				//const material = new THREE.MeshBasicMaterial({ color: 0x00ff00,opacity:0.5});
+				const cube = new THREE.Mesh(geometry, material);
+				cube.translateY(0.05);
+				// cube.material.opacity = 0.5;
+				// cube.setInteractive(true);
+				cube.name = "objectName";
+
+				// Use the lookAt method to focus the camera on the cube
+				camera.lookAt(cube.position);
+				panel.add(camera);
+				panel.add(cube);
+				panel.add(grid);
+				scene.add(panel);
+				render();
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+
+				render();
+			}
+
+			function render() {
+				renderer.render(scene, camera);
+			}
+		</script>
+	</body>
+</html>
