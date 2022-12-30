@@ -73,20 +73,19 @@
 				//Adding Cube
 				const geometry = new THREE.BoxGeometry(1, 1, 1);
 				// Create a texture for the cube
-				//var texture = new THREE.TextureLoader().load("");
+
 				const texture = loader.load("textures/crate_grey8.tga");
 
 				// Create a material for the cube
-				// const material = new THREE.MeshBasicMaterial({ map: texture });
+
 				const material = new THREE.MeshBasicMaterial({
 					color: 0xffffff,
 					map: texture,
 				});
-				//const material = new THREE.MeshBasicMaterial({ color: 0x00ff00,opacity:0.5});
+
 				const cube = new THREE.Mesh(geometry, material);
 				cube.translateY(0.5);
-				// cube.material.opacity = 0.5;
-				// cube.setInteractive(true);
+
 				cube.name = "objectName";
 
 				scene.add(cube);
@@ -107,7 +106,7 @@
 
 			const raycaster = new THREE.Raycaster();
 			const mouse = new THREE.Vector2();
-			// 	var object = scene.getObjectByName( "objectName" );
+
 			// Define the event handler function
 			function onDocumentMouseDown(event) {
 				//alert("here");
@@ -159,21 +158,20 @@
 				//Adding Cube
 				const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
 				// Create a texture for the cube
-				//var texture = new THREE.TextureLoader().load("");
+
 				const loader = new TGALoader();
 				const texture = loader.load("textures/crate_grey8.tga");
 
 				// Create a material for the cube
-				// const material = new THREE.MeshBasicMaterial({ map: texture });
+
 				const material = new THREE.MeshBasicMaterial({
 					color: 0xffffff,
 					map: texture,
 				});
-				//const material = new THREE.MeshBasicMaterial({ color: 0x00ff00,opacity:0.5});
+
 				const cube = new THREE.Mesh(geometry, material);
 				cube.translateY(0.05);
-				// cube.material.opacity = 0.5;
-				// cube.setInteractive(true);
+
 				cube.name = "objectName";
 
 				// Use the lookAt method to focus the camera on the cube
