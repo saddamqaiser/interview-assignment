@@ -1,5 +1,5 @@
 # interview-assignment
-# Installation and Running
+## Installation and Running
  -Please "npm install" first to install the project.
 -Run "npm start" to run the application in the browser.
 -If nothing is running on port 8080.This project usually runs on "https://localhost:8080"
